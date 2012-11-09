@@ -1,0 +1,97 @@
+#!/usr/bin/python
+
+import pdb
+import sys
+from psphere.client import Client
+from psphere.managedobjects import ComputeResource
+from psphere.managedobjects import HostSystem
+from psphere.managedobjects import VirtualMachine
+
+def main(options):
+    """A simple connection test to login and print the server time."""
+        
+    client = Client(server=options.server, username=options.username, password=options.password)
+    print('Successfully connected to %s' % client.server)
+    print(client.si.CurrentTime())
+    
+    client.logout()
+
+
+def list(options):
+    print "### listing"
+    client = Client(server=options.server, username=options.username, password=options.password)
+
+    #pdb.set_trace()
+
+    if sys.argv[2] == "computeresource":
+        x = client.find_entity_view("ComputeResource")
+        pdb.set_trace()
+
+    if sys.argv[2] == "vms":
+        #pdb.set_trace()
+        x = VirtualMachine.all(client)
+        #pdb.set_trace()
+
+        # sort list aphabetically 
+        y = sorted(x, key=lambda x: x.name, reverse=False)
+
+        for vm in y:
+            
+            #pdb.set_trace()
+
+            if options.filter:
+                if options.filter in vm.name:
+                    if options.detail:
+                        print vm.summary
+                    else:
+                        try:
+                            ip = vm.summary.guest.ipAddress
+                        except:
+                            ip = 'None'
+                        print "%s -- %s %s" %(vm.name, vm.runtime.powerState, ip)
+            else:
+                if options.detail:
+                    print vm.summary
+                else:
+                    #pdb.set_trace()
+                    try:
+                        ip = vm.summary.guest.ipAddress
+                    except:
+                        ip = "None"
+
+                    print "%s -- %s %s" %(vm.name, vm.runtime.powerState, ip)
+
+    client.logout()
+
+
+if __name__ == "__main__":
+    from optparse import OptionParser
+    usage = "Usage: %prog subcommand [options]"
+    parser = OptionParser(usage=usage)
+    parser.add_option("--server", dest="server",
+                      help="The server to connect to for provisioning")
+    parser.add_option("--username", dest="username",
+                      help="The username used to connect to the server")
+    parser.add_option("--password", dest="password",
+                      help="The password used to connect to the server")
+    parser.add_option('-d', '--detail', dest='detail', default=False, action='store_true',
+                      help="Show details for entities")
+    parser.add_option('-f', "--filter", dest="filter",
+                      help="filter entities by string")
+
+
+    (options, args) = parser.parse_args()
+
+    #pdb.set_trace()
+    if sys.argv[1].startswith('--'):
+        print "Shouldn't be here..."
+
+
+    if sys.argv[1] == 'list':
+        #print "listing"
+        list(options)
+    else:
+        print "%s is not a supported subcommand" % sys.argv[1]
+    
+
+    #main(options)
