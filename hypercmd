@@ -48,7 +48,10 @@ def list(options):
                             ip = vm.summary.guest.ipAddress
                         except:
                             ip = 'None'
-                        print "%s -- %s %s" %(vm.name, vm.runtime.powerState, ip)
+                        print "%s -- %s,%s,%s" %(vm.name, 
+                                            vm.runtime.powerState, 
+                                            ip,
+                                            vm.summary.config.uuid)
             else:
                 if options.detail:
                     print vm.summary
@@ -59,7 +62,10 @@ def list(options):
                     except:
                         ip = "None"
 
-                    print "%s -- %s %s" %(vm.name, vm.runtime.powerState, ip)
+                    print "%s -- %s,%s,%s" %(vm.name, 
+                                            vm.runtime.powerState, 
+                                            ip,
+                                            vm.summary.config.uuid)
 
     client.logout()
 
